@@ -4,100 +4,96 @@ from MC.drl_sample_project_python.drl_lib.do_not_touch.contracts import SingleAg
 
 
 class TicTacToe(SingleAgentEnv):
-    def __init__(self, nb_cells: int = 3**9):
-        self.nb_cells = nb_cells
+    def __init__(self):
+        self.nb_cells = 9
         self.current_cell = 0
         self.step_count = 0
-        self.win_rate = 0.0
         self.nterminal = 0
+        self.theBoard = [" ", " ", " ", " ", " ", " ", " ", " "]
 
     def state_id(self) -> int:
         return self.current_cell
 
+    def take_turn(self):
+        if self.step_count % 2 == 0:
+            return "X"
+        else :
+            return "O"
+
     def is_game_over(self) -> bool:
-        if self.step_count == 9:
+        if self.step_count == 8:
             return True
-        values = self.values_cases()
-        for i in range(3):
-            if (values[i] == values[i + 3] and values[i + 3] == values[i + (2 * 3)] and (values[i] == 1 or values[i] == 2)) or \
-                    (values[i * 3] == values[(i * 3) + 1] and values[(i * 3) + 1] == values[(i * 3) + 2] and (values[i * 3] == 1 or values[i * 3] == 2)) or \
-                    (values[i] == values[4] and values[4] == values[8 - i] and (values[i] == 1 or values[i] == 2)):
-                return True
-        return False
+        elif self.theBoard[6] == self.theBoard[7] == self.theBoard[8] != ' ':  # --- top
+            return True
+        elif self.theBoard[3] == self.theBoard[4] == self.theBoard[5] != ' ':  # --- middle
+            return True
+        elif self.theBoard[0] == self.theBoard[1] == self.theBoard[2] != ' ':  # --- bottom
+            return True
+        elif self.theBoard[0] == self.theBoard[3] == self.theBoard[6] != ' ':  # | left side
+            return True
+        elif self.theBoard[1] == self.theBoard[4] == self.theBoard[7] != ' ':  # | middle
+            return True
+        elif self.theBoard[2] == self.theBoard[5] == self.theBoard[8] != ' ':  # | right side
+            return True
+        elif self.theBoard[6] == self.theBoard[4] == self.theBoard[2] != ' ':  # / diagonal
+            return True
+        elif self.theBoard[0] == self.theBoard[4] == self.theBoard[8] != ' ':  # \ diagonal
+            return True
+        else:
+            return False
 
     def available_actions_ids(self) -> np.ndarray:
-        aa = []
-        values = self.values_cases()
-        for i in range(9):
-            if values[i] == 0:
-                aa.append(i)
-        return np.array(aa)
+        available = []
+        for i in range(len(self.theBoard)):
+            if self.theBoard[i] == " ":
+                available.append(i)
+        return available
 
     def act_with_action_id(self, action_id: int):
-        if self.step_count % 2 == 0:
-            self.current_cell += 3**(8 - action_id)
+        if self.theBoard[action_id] == " ":
+            if self.take_turn() == "X":
+                self.theBoard[action_id] = "X"
+            elif self.take_turn() == "O":
+                self.theBoard[action_id] = "O"
+            self.step_count += 1
         else:
-            aa = self.available_actions_ids()
-            random_move = random.randint(0, len(aa) - 1)
-            self.current_cell += 2 * (3**(8 - aa[random_move]))
-        self.step_count += 1
+            print("La case est occupé")
+
 
     def score(self) -> float:
-        values = self.values_cases()
-        for i in range(3):
-            if (values[i] == values[i + 3] and values[i + 3] == values[i + (2 * 3)] and values[i] == 1) or \
-                    (values[i * 3] == values[(i * 3) + 1] and values[(i * 3) + 1] == values[(i * 3) + 2] and values[i * 3] == 1) or \
-                    (values[i] == values[4] and values[4] == values[8 - i] and values[i] == 1):
-                return 1.0
-            elif (values[i] == values[i + 3] and values[i + 3] == values[i + (2 * 3)] and values[i] == 2) or \
-                    (values[i * 3] == values[(i * 3) + 1] and values[(i * 3) + 1] == values[(i * 3) + 2] and values[i * 3] == 2) or \
-                    (values[i] == values[4] and values[4] == values[8 - i] and values[i] == 2):
+        turn = self.take_turn()
+        if turn == "X":
+            if (self.theBoard[6] == self.theBoard[7] == self.theBoard[8] != ' ') or (
+                    self.theBoard[3] == self.theBoard[4] == self.theBoard[5] != ' ') or (
+                    self.theBoard[0] == self.theBoard[1] == self.theBoard[2] != ' ') or (
+                    self.theBoard[0] == self.theBoard[3] == self.theBoard[6] != ' ') or (
+                    self.theBoard[1] == self.theBoard[4] == self.theBoard[7] != ' ') or (
+                    self.theBoard[2] == self.theBoard[5] == self.theBoard[8] != ' ') or (
+                    self.theBoard[6] == self.theBoard[4] == self.theBoard[2] != ' ') or (
+                    self.theBoard[0] == self.theBoard[4] == self.theBoard[8] != ' '):
                 return -1.0
-        return 0.0
-
-    def winrate(self):
-        print(f'win rate : {self.win_rate/self.nterminal if self.nterminal > 0 else 0}')
-        print(f'game played : {self.nterminal}')
+        if turn == "O":
+            if (self.theBoard[6] == self.theBoard[7] == self.theBoard[8] != ' ') or (
+                    self.theBoard[3] == self.theBoard[4] == self.theBoard[5] != ' ') or (
+                    self.theBoard[0] == self.theBoard[1] == self.theBoard[2] != ' ') or (
+                    self.theBoard[0] == self.theBoard[3] == self.theBoard[6] != ' ') or (
+                    self.theBoard[1] == self.theBoard[4] == self.theBoard[7] != ' ') or (
+                    self.theBoard[2] == self.theBoard[5] == self.theBoard[8] != ' ') or (
+                    self.theBoard[6] == self.theBoard[4] == self.theBoard[2] != ' ') or (
+                    self.theBoard[0] == self.theBoard[4] == self.theBoard[8] != ' '):
+                return 1.0
+        else:
+            return 0.0
 
     def reset(self):
         self.current_cell = 0
         self.step_count = 0
+        self.theBoard = [" ", " ", " ", " ", " ", " ", " ", " "]
 
     def view(self):
-        print(f'Game Over: {self.is_game_over()}')
-        values = self.values_cases()
-        for i in range(3):
-            for j in range(3):
-                if values[(i * 3) + j] == 0:
-                    print("_", end="")
-                elif values[(i * 3) + j] == 1:
-                    print("X", end="")
-                else:
-                    print("O", end="")
-            print()
-        if self.is_game_over():
-            print(f'score : {self.score()}')
-            self.win_rate += self.score()
-            self.nterminal += 1
-            self.winrate()
+        print(self.theBoard[0] + '|' + self.theBoard[1] + '|' + self.theBoard[2])
+        print('-+-+-')
+        print(self.theBoard[3] + '|' + self.theBoard[4] + '|' + self.theBoard[5])
+        print('-+-+-')
+        print(self.theBoard[6] + '|' + self.theBoard[7] + '|' + self.theBoard[8])
 
-    def reset_random(self):
-        self.reset()
-        aa = self.available_actions_ids()
-        while len(aa) > 0:
-            random_move = random.randint(0, len(aa) - 1)
-            rand = random.randint(0, 1)
-            if self.step_count % 2 == 0:
-                self.current_cell += rand * 3 ** (8 - aa[random_move])
-            else:
-                self.current_cell += rand * 2 * (3 ** (8 - aa[random_move]))
-            self.step_count += rand
-            aa = np.delete(aa, random_move)
-
-    def values_cases(self) -> np.ndarray:
-        values = np.zeros(9)
-        tmp_state = self.current_cell
-        for i in range(9):
-            values[i] = tmp_state // 3**(8 - i)
-            tmp_state %= 3**(8 - i)
-        return values
