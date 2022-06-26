@@ -1,34 +1,18 @@
-from MC.drl_sample_project_python.drl_lib.do_not_touch.mdp_env_wrapper import Env1
-from MC.drl_sample_project_python.drl_lib.do_not_touch.result_structures import ValueFunction, PolicyAndValueFunction
+from RlearningMDPenvimplementation.MC.drl_sample_project_python.drl_lib.do_not_touch.mdp_env_wrapper import Env1
+from RlearningMDPenvimplementation.MC.drl_sample_project_python.drl_lib.to_do.GridWorld import *
+from RlearningMDPenvimplementation.MC.drl_sample_project_python.drl_lib.do_not_touch.result_structures import ValueFunction, PolicyAndValueFunction
 
 import numpy as np
 
-def line_world():
-    S = [0, 1, 2, 3, 4, 5, 6]
-    A = [0, 1]
-    R = [-1.0, 0.0, 1.0]
-
-    p = np.zeros((len(S), len(A), len(S), len(R)))
-
-    for s in S[1:-1]:
-        if s == 1:
-            p[s, 0, s - 1, 0] = 1.0
-        else:
-            p[s, 0, s - 1, 1] = 1.0
-
-        if s == S[-2]:
-            p[s, 1, s + 1, 2] = 1.0
-        else:
-            p[s, 1, s + 1, 1] = 1.0
-    return S, A, R, p
-
-def policy_evaluation_on_line_world(pi: np.ndarray,S,A,R,p) -> ValueFunction:
+def policy_evaluation_on_line_world(pi: np.ndarray) -> ValueFunction:
     """
     Creates a Line World of 7 cells (leftmost and rightmost are terminal, with -1 and 1 reward respectively)
     Launches a Policy Evaluation Algorithm in order to find the Value Function of a uniform random policy
     Returns the Value function (V(s)) of this policy
     """
-
+    S = LineWorld().states()
+    A = LineWorld().actions()
+    R = LineWorld().rewards()
     theta = 0.0000001
     V = np.random.random((len(S),))
     V[0] = 0.0
@@ -43,7 +27,7 @@ def policy_evaluation_on_line_world(pi: np.ndarray,S,A,R,p) -> ValueFunction:
                 total = 0.0
                 for s_p in S:
                     for r in range(len(R)):
-                        total += p[s, a, s_p, r] * (R[r] + 0.999 * V[s_p])
+                        total += LineWorld().transition_probability(s, a, s_p, r) * (R[r] + 0.999 * V[s_p])
                 total *= pi[s, a]
                 V[s] += total
             delta = max(delta, np.abs(v - V[s]))
@@ -52,14 +36,16 @@ def policy_evaluation_on_line_world(pi: np.ndarray,S,A,R,p) -> ValueFunction:
     return V
 
 
-def policy_iteration_on_line_world(pi: np.ndarray, S, A, R, p) -> PolicyAndValueFunction:
+def policy_iteration_on_line_world(pi: np.ndarray) -> PolicyAndValueFunction:
     """
     Creates a Line World of 7 cells (leftmost and rightmost are terminal, with -1 and 1 reward respectively)
     Launches a Policy Iteration Algorithm in order to find the Optimal Policy and its Value Function
     Returns the Policy (Pi(s,a)) and its Value Function (V(s))
     """
 
-
+    S = LineWorld().states()
+    A = LineWorld().actions()
+    R = LineWorld().rewards()
     theta = 0.0000001
     V = np.random.random((len(S),))
     V[0] = 0.0
@@ -67,7 +53,7 @@ def policy_iteration_on_line_world(pi: np.ndarray, S, A, R, p) -> PolicyAndValue
 
     pi = np.random.random((len(S), (len(A))))
     for s in S:
-        pi[s] /= np.sum(pi[s])
+        pi[s] = np.sum(pi[s])
 
     pi[0] = 0.0
     pi[len(S) - 1] = 0.0
@@ -84,7 +70,7 @@ def policy_iteration_on_line_world(pi: np.ndarray, S, A, R, p) -> PolicyAndValue
                     total = 0.0
                     for s_p in S:
                         for r in range(len(R)):
-                            total += p[s, a, s_p, r] * (R[r] + 0.999 * V[s_p])
+                            total += round(LineWorld().transition_probability(s, a, s_p, r) * (R[r] + 0.999 * V[s_p]),4)
                     total *= pi[s, a]
                     V[s] += total
                 delta = max(delta, np.abs(v - V[s]))
@@ -101,7 +87,7 @@ def policy_iteration_on_line_world(pi: np.ndarray, S, A, R, p) -> PolicyAndValue
                 total = 0
                 for s_p in S:
                     for r in range(len(R)):
-                        total += p[s, a, s_p, r] * (R[r] + 0.999 * V[s_p])
+                        total += LineWorld().transition_probability(s, a, s_p, r) * (R[r] + 0.999 * V[s_p])
                 if total > best_a_score:
                     best_a = a
                     best_a_score = total
@@ -113,13 +99,15 @@ def policy_iteration_on_line_world(pi: np.ndarray, S, A, R, p) -> PolicyAndValue
             return pi, V
 
 
-def value_iteration_on_line_world(pi: np.ndarray, S, A, R, p) -> PolicyAndValueFunction:
+def value_iteration_on_line_world(pi: np.ndarray) -> PolicyAndValueFunction:
     """
     Creates a Line World of 7 cells (leftmost and rightmost are terminal, with -1 and 1 reward respectively)
     Launches a Value Iteration Algorithm in order to find the Optimal Policy and its Value Function
     Returns the Policy (Pi(s,a)) and its Value Function (V(s))
     """
-
+    S = LineWorld().states()
+    A = LineWorld().actions()
+    R = LineWorld().rewards()
     theta = 0.0000001
     V = np.random.random((len(S),))
     V[0] = 0.0
@@ -135,7 +123,7 @@ def value_iteration_on_line_world(pi: np.ndarray, S, A, R, p) -> PolicyAndValueF
                 for s_p in S:
                     new_value = 0
                     for r in range(len(R)):
-                        total += p[s, a, s_p, r] * (R[r] + 0.999 * V[s_p])
+                        total += LineWorld().transition_probability(s, a, s_p, r) * (R[r] + 0.999 * V[s_p])
                 total *= pi[s, a]
                 V[s] += total
                 if total > new_value:
@@ -148,14 +136,37 @@ def value_iteration_on_line_world(pi: np.ndarray, S, A, R, p) -> PolicyAndValueF
     return V
 
 
-def policy_evaluation_on_grid_world() -> ValueFunction:
+def policy_evaluation_on_grid_world(pi: np.ndarray) -> ValueFunction:
     """
     Creates a Grid World of 5x5 cells (upper rightmost and lower rightmost are terminal, with -1 and 1 reward respectively)
     Launches a Policy Evaluation Algorithm in order to find the Value Function of a uniform random policy
     Returns the Value function (V(s)) of this policy
     """
+    S = GridWorld().states()
+    A = GridWorld().actions()
+    R = GridWorld().rewards()
 
+    theta = 0.0000001
+    V = np.random.random((len(S),))
+    V[0] = 0.0
+    V[S[-1]] = 0.0
 
+    while True:
+        delta = 0
+        for s in S:
+            v = V[s]
+            V[s] = 0.0
+            for a in A:
+                total = 0.0
+                for s_p in S:
+                    for r in range(len(R)):
+                        total += GridWorld().transition_probability(s, a, s_p, r) * (R[r] + 0.999 * V[s_p])
+                total *= pi[s, a]
+                V[s] += total
+            delta = max(delta, np.abs(v - V[s]))
+        if delta < theta:
+            break
+    return V
 
 def policy_iteration_on_grid_world() -> PolicyAndValueFunction:
     """
@@ -211,21 +222,21 @@ def value_iteration_on_secret_env1() -> PolicyAndValueFunction:
 
 
 def demo():
-    S = line_world()[0]
-    A = line_world()[1]
-    R = line_world()[2]
-    p = line_world()[3]
+
+    S = LineWorld().states()
+    A = LineWorld().actions()
     right_pi = np.zeros((len(S), len(A)))
     right_pi[:, 1] = 1.0
 
-    print(policy_evaluation_on_line_world(right_pi, S, A, R, p))
-    print(policy_iteration_on_line_world(right_pi, S, A, R, p))
-    print(value_iteration_on_line_world(right_pi, S, A, R, p))
+    print(policy_evaluation_on_line_world(right_pi))
+    print(policy_iteration_on_line_world(right_pi))
+    print(value_iteration_on_line_world(right_pi))
 
-    print(policy_evaluation_on_grid_world())
-    print(policy_iteration_on_grid_world())
+    pi = np.ones((len(S), len(A))) * 0.5
+    print(policy_evaluation_on_grid_world(pi))
+    """print(policy_iteration_on_grid_world())
     print(value_iteration_on_grid_world())
 
     print(policy_evaluation_on_secret_env1())
     print(policy_iteration_on_secret_env1())
-    print(value_iteration_on_secret_env1())
+    print(value_iteration_on_secret_env1())"""
