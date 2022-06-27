@@ -1,8 +1,11 @@
-from RlearningMDPenvimplementation.MC.drl_sample_project_python.drl_lib.do_not_touch.mdp_env_wrapper import Env1
-from RlearningMDPenvimplementation.MC.drl_sample_project_python.drl_lib.to_do.GridWorld import *
-from RlearningMDPenvimplementation.MC.drl_sample_project_python.drl_lib.do_not_touch.result_structures import ValueFunction, PolicyAndValueFunction
+from MC.drl_sample_project_python.drl_lib.do_not_touch.mdp_env_wrapper import Env1
+from MC.drl_sample_project_python.drl_lib.to_do.GridWorld import *
+from MC.drl_sample_project_python.drl_lib.do_not_touch.result_structures import ValueFunction, PolicyAndValueFunction
 
 import numpy as np
+
+from MC.drl_sample_project_python.drl_lib.to_do.GridWorld import LineWorld, GridWorld
+
 
 def policy_evaluation_on_line_world(pi: np.ndarray) -> ValueFunction:
     """
@@ -232,6 +235,8 @@ def demo():
     print(policy_iteration_on_line_world(right_pi))
     print(value_iteration_on_line_world(right_pi))
 
+    S = GridWorld().states()
+    A = GridWorld().actions()
     pi = np.ones((len(S), len(A))) * 0.5
     print(policy_evaluation_on_grid_world(pi))
     """print(policy_iteration_on_grid_world())
