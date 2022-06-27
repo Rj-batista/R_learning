@@ -9,51 +9,38 @@ def monte_carlo_es_on_tic_tac_toe_solo() -> PolicyAndActionValueFunction:
     Launches a Monte Carlo ES (Exploring Starts) in order to find the optimal Policy and its action-value function
     Returns the Optimal Policy (Pi(s,a)) and its Action-Value function (Q(s,a))
     """
-    S = np.arange(len(TicTacToe.theBoard))
-    A = np.array(len(TicTacToe.theBoard))
-    R = np.array([-1.0, 0.0, 1.0])
 
-    def step(s: int, a: int) -> (int, float, bool):
-        if s == 0 or s == nb_cells - 1:
-            return s, 0.0, True
-
-        if a == 0:
-            s_p = s - 1
-            if s == 1:
-                return s_p, -1.0, True
-            else:
-                return s_p, 0.0, False
-
-        if a == 1:
-            s_p = s + 1
-            if s == nb_cells - 2:
-                return s_p, 1.0, True
-            else:
-                return s_p, 0.0, False
+    def step(tic2) -> (int, float, bool):
+        tic2.act_with_action_id()
+        return np.sum(tic2.theBoard), tic2.score(), tic2.is_game_over()
 
     # @numba.jit(nopython=True, parallel=True)
     def monte_carlo_control_with_exploring_starts(S, A, iter_count, max_step):
-        pi = np.random.random((len(S), len(A)))
+        tic2 = TicTacToe()
+        tic2.theBoard = S
+
+        pi = np.random.random((len(tic2.theBoard), len(tic2.theBoard)))
         for s in S:
             pi[s] /= np.sum(pi[s])
 
-        q = np.random.random((len(S), len(A)))
+        q = np.random.random((len(tic2.theBoard), len(tic2.theBoard)))
 
         Returns = [[[] for a in A] for s in S]
 
         for it in range(iter_count):
-            s0 = np.random.choice(S)
-            a0 = np.random.choice(A)
+            choice = np.random.choice(tic2.available_actions_ids())
+            s0 = np.random.choice(choice)
+            a0 = np.random.choice(choice)
             s = s0
             a = a0
 
-            s_p, r, terminal = step(s0, a0)
+            s_p, r, terminal = step(tic2)
             s_history = [s]
             a_history = [a]
             s_p_history = [s_p]
             r_history = [r]
 
-            step_count = 1
+            tic2.step_count += 1
             while terminal == False and step_count < max_step:
                 s = s_p
                 a = np.random.choice(A, p=pi[s])
@@ -85,11 +72,10 @@ def monte_carlo_es_on_tic_tac_toe_solo() -> PolicyAndActionValueFunction:
                 pi[s_t, np.argmax(q[s_t])] = 1.0
 
         return pi, q
-    def game():
-        while TicTacToe.is_game_over() == False:
-            TicTacToe.view()
-            choix = input("Faite un choix entre 0 et 8:")
-            TicTacToe.act_with_action_id(choix)
+
+
+
+
 
 
 
