@@ -9,7 +9,7 @@ class TicTacToe(SingleAgentEnv):
         self.current_cell = 0
         self.step_count = 0
         self.nterminal = 0
-        self.theBoard = [" ", " ", " ", " ", " ", " ", " ", " "]
+        self.theBoard = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
 
     def state_id(self) -> int:
         return self.current_cell
