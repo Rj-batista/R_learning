@@ -1,7 +1,7 @@
 import math
 import random
 import numpy as np
-from RlearningMDPenvimplementation.MC.drl_sample_project_python.drl_lib.do_not_touch.contracts import SingleAgentEnv
+from MC.drl_sample_project_python.drl_lib.do_not_touch.contracts import SingleAgentEnv
 
 
 class LineWorld(SingleAgentEnv):

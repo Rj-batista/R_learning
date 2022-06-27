@@ -1,4 +1,4 @@
-from RlearningMDPenvimplementation.MC.drl_sample_project_python.drl_lib.do_not_touch.contracts import MDPEnv, SingleAgentEnv
+from MC.drl_sample_project_python.drl_lib.do_not_touch.contracts import MDPEnv, SingleAgentEnv
 import numpy as np
 import random
 
@@ -85,7 +85,7 @@ class GridWorld(MDPEnv):
         gauche = [0, 5, 10, 15, 20]
         droite = [4, 9, 14, 19, 24]
 
-        for s in S[:-1]:
+        for s in S:
             # gauche
             if s in gauche:
                 p[s, 1, s - 1, 1] = 0.0
@@ -109,8 +109,8 @@ class GridWorld(MDPEnv):
                 p[s, 3, s + 1, 1] = 1.0
             # bas
             if s in bas:
-                p[s, 0, s + self.rows, 1] = 0.0
-            if s == 19:
+                p[s, 0, s, 0] = 1.0
+            elif s == 19:
                 p[s, 0, s + self.rows, 2] = 1.0
             else:
                 p[s, 0, s + self.rows, 1] = 1.0
